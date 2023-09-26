@@ -2,20 +2,20 @@ import "./css/styles.css";
 
 import debounce from "lodash.debounce";
 import { Notify } from "notiflix/build/notiflix-notify-aio";
-import { fetchCountries } from "./fetchCountries";
+import { fetchCountries, Country } from "./fetchCountries";
 
 const DEBOUNCE_DELAY = 300;
 
 const refs = {
-	nameCountryInput: document.querySelector("#search-box"),
-	countrysList: document.querySelector(".country-list"),
-	countryInfo: document.querySelector(".country-info"),
+	nameCountryInput: document.querySelector<HTMLInputElement>("#search-box"),
+	countrysList: document.querySelector<HTMLUListElement>(".country-list"),
+	countryInfo: document.querySelector<HTMLDivElement>(".country-info"),
 };
 
-refs.nameCountryInput.addEventListener("input", debounce(countryNameInputHandler, DEBOUNCE_DELAY));
+refs.nameCountryInput?.addEventListener("input", debounce(countryNameInputHandler, DEBOUNCE_DELAY));
 
 function countryNameInputHandler() {
-	const searchQuery = refs.nameCountryInput.value.trim();
+	const searchQuery = refs.nameCountryInput?.value.trim();
 
 	if (!searchQuery) {
 		clearAllInfo();
@@ -24,32 +24,36 @@ function countryNameInputHandler() {
 
 	fetchCountries(searchQuery)
 		.then(countryResponceHandler)
-		.catch(err => {
+		.catch(() => {
 			clearAllInfo();
 			Notify.failure("Oops, there is no country with that name");
 		});
 }
 
-function countryResponceHandler(countries) {
+function countryResponceHandler(countries: Country[]): void {
 	if (countries.length > 10) {
 		Notify.info("Too many matches found. Please enter a more specific name.");
 	} else if (countries.length === 1) {
 		clearAllInfo();
-		refs.countryInfo.innerHTML = createOneCountryMarkup(countries[0]);
+		if (refs.countryInfo) {
+			refs.countryInfo.innerHTML = createOneCountryMarkup(countries[0]);
+		}
 	} else {
 		clearAllInfo();
-		refs.countrysList.innerHTML = countries.map(createCountryListMarkup).join("");
+		if (refs.countrysList) {
+			refs.countrysList.innerHTML = countries.map(createCountryListMarkup).join("");
+		}
 	}
 }
 
-function createCountryListMarkup({ flags, name }) {
+function createCountryListMarkup({ flags, name }: Country) {
 	return `<li class="country-list-item">
       <img src="${flags.svg}" alt="country flag" width="40" height="40" />
       <p class="country-name">${name.official}</p>
       </li>`;
 }
 
-function createOneCountryMarkup({ flags, name, capital, population, languages }) {
+function createOneCountryMarkup({ flags, name, capital, population, languages }: Country) {
 	return `<h2 class="country-name">
         <img
           src="${flags.svg}"
@@ -69,6 +73,8 @@ function createOneCountryMarkup({ flags, name, capital, population, languages })
 }
 
 function clearAllInfo() {
-	refs.countryInfo.innerHTML = "";
-	refs.countrysList.innerHTML = "";
+	if (refs.countrysList && refs.countryInfo) {
+		refs.countryInfo.innerHTML = "";
+		refs.countrysList.innerHTML = "";
+	}
 }
