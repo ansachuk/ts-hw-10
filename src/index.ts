@@ -54,22 +54,16 @@ function createCountryListMarkup({ flags, name }: Country) {
 }
 
 function createOneCountryMarkup({ flags, name, capital, population, languages }: Country) {
-	return `<h2 class="country-name">
-        <img
-          src="${flags.svg}"
-          width="60"
-          height="60"
-          alt="country flag"
-        />
-        ${name.official}
-      </h2>
-      <ul class="country__list--info">
-        <li class="country__info--item"><b>Capital: </b>${capital}</li>
-        <li class="country__info--item"><b>Population: </b>${population}</li>
-        <li class="country__info--item">
-          <b>Languages: </b>${Object.values(languages).join(", ")}
-        </li>
-      </ul>`;
+	return `
+		<h2 class="country-name">
+			<img src="${flags.svg}" width="60" height="60" alt="country flag" />
+			${name.official}
+		</h2>
+		<ul class="country__list--info">
+			<li class="country__info--item"><b>Capital: </b>${capital}</li>
+			<li class="country__info--item"><b>Population: </b>${population}</li>
+			<li class="country__info--item"><b>Languages: </b>${Object.values(languages).join(", ")}</li>
+		</ul>`;
 }
 
 function clearAllInfo() {
